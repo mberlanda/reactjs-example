@@ -3,4 +3,8 @@
 #= require react
 #= require_tree .
 
-
+$ ->
+  React.renderComponent(
+    React.DOM.div({}, "Hello world!"),
+    document.body
+  )
