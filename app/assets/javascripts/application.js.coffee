@@ -24,3 +24,10 @@ $ ->
       document.body
     )
   );
+
+  setInterval(->
+    React.renderComponent(
+      virtualDom(new Date().getSeconds()),
+      document.body
+    )
+  , 1000);
