@@ -4,11 +4,20 @@
 #= require_tree .
 
 $ ->
+  linkClicked = (event) ->
+    console.log(event)
+    console.log(event.target)
+
+    React.renderComponent(
+      virtualDom("You clicked me"),
+      document.body
+    )
+    
   virtualDom = (linkText) ->
     React.DOM.div(
       {id: "render-me-react-please"},
       React.DOM.a(
-        {href:"javascript:void(0)"},
+        {href:"javascript:void(0)", onClick: linkClicked},
         linkText
       )
     )
@@ -17,17 +26,3 @@ $ ->
     virtualDom("Click me"),
     document.body
   )
-
-  $( "a" ).click(->
-    React.renderComponent(
-      virtualDom("You clicked me"),
-      document.body
-    )
-  );
-
-  setInterval(->
-    React.renderComponent(
-      virtualDom(new Date().getSeconds()),
-      document.body
-    )
-  , 1000);
