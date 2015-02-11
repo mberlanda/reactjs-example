@@ -4,25 +4,33 @@
 #= require_tree .
 
 $ ->
-  linkClicked = (event) ->
-    console.log(event)
-    console.log(event.target)
+  # leanpub-start-insert
+  virtualDomAfterClick = React.DOM.div(
+    {id: "render-me-react-please"},
+    React.DOM.span(
+      {},
+      "You clicked the link"
+    )
+  )
+  # leanpub-end-insert
 
+  linkClicked = (event) ->
+    # leanpub-start-insert
     React.renderComponent(
-      virtualDom("You clicked me"),
+      virtualDomAfterClick,
       document.body
     )
+    # leanpub-end-insert
     
-  virtualDom = (linkText) ->
-    React.DOM.div(
-      {id: "render-me-react-please"},
-      React.DOM.a(
-        {href:"javascript:void(0)", onClick: linkClicked},
-        linkText
-      )
+  virtualDomBeforeClick = React.DOM.div(
+    {id: "render-me-react-please"},
+    React.DOM.a(
+      {href:"javascript:void(0)", onClick: linkClicked},
+      "Click me"
     )
+  )
 
   React.renderComponent(
-    virtualDom("Click me"),
+    virtualDomBeforeClick,
     document.body
   )
