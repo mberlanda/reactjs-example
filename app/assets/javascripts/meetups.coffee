@@ -4,11 +4,45 @@
 
 DOM = React.DOM
 
+DateWithLabel = React.createClass
+  
+  getDefaultProps: ->
+    date: new Date()
+
+  displayName: "DateWithLabel"
+  
+  onYearChange: ->
+    newDate = new Date(
+      event.target.value,
+      @props.date.getMonth(),
+      @props.date.getDate(),
+      )
+    @propos.onChange(newDate)
+  
+  render: -> 
+    DOM.div
+      className: "form-group"
+      DOM.label
+        className: "col-lg-2 control-label"
+        "Date"
+      DOM.div
+        className: "col-lg-2"
+        DOM.select
+          className: "form-control"
+          onChange: @onYearChange
+          value: @props.date.getFullYear()
+          DOM.option(value: year, key: year, year) for year in [2015..2020]
+
+dateWithLabel = React.createFactory(DateWithLabel)
+
 FormInputWithLabel = React.createClass
+  
   getDefaultProps: ->
     elementType: "input"
     inputType: "text"
+  
   displayName: "FormInputWithLabel"
+  
   render: ->
     DOM.div
       className: "form-group"
@@ -41,6 +75,7 @@ window.CreateNewMeetupForm = React.createClass
       meetup: {
         title: "",
         description: "",
+        date: new Date(),
       }
     }
   titleChanged: (event) ->
@@ -50,6 +85,10 @@ window.CreateNewMeetupForm = React.createClass
   descriptionChanged: (event) ->
     @state.meetup.description = event.target.value
     @forceUpdate()
+
+  dateChanged: (newDate) ->
+    @state.meetup.date = newDate
+    @forceUpdate
 
   formSubmitted: (event) ->
     event.preventDefault()
@@ -83,6 +122,10 @@ window.CreateNewMeetupForm = React.createClass
           placeholder: "Meetup description"
           labelText: "Description"
           elementType: "textarea"
+
+        dateWithLabel
+          onChange: @dateChanged
+          date: @state.meetup.date
 
         DOM.div
           className: "form-group"
