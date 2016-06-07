@@ -5,6 +5,8 @@
 DOM = React.DOM
 
 window.CreateNewMeetupForm = React.createClass
+  displayName: "CreateNewMeetupForm"
+  
   getInitialState: ->
     {
       meetup: {
