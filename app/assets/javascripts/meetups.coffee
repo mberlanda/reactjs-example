@@ -189,6 +189,7 @@ window.CreateNewMeetupForm = React.createClass
         title: "",
         description: "",
         date: new Date(),
+        technology: @props.technologies[0].name,
         seoText: null,
         guests: [""],
       },
@@ -210,6 +211,10 @@ window.CreateNewMeetupForm = React.createClass
 
   dateChanged: (newDate) ->
     @state.meetup.date = newDate
+    @forceUpdate()
+
+  technologyChanged: (event) ->
+    @state.meetup.technology = event.target.value
     @forceUpdate()
 
   seoChanged: (seoText) ->
@@ -257,7 +262,8 @@ window.CreateNewMeetupForm = React.createClass
         description: meetup.description,
         date: "#{meetup.date.getFullYear()}-#{meetup.date.getMonth()+1}-#{meetup.date.getDate()}",
         seo: @state.meetup.seoText || @computeDefaultSeoText(),
-        guests: @state.meetup.guests
+        guests: @state.meetup.guests,
+        technology: @state.meetup.technology
       }})
 
   render: ->
@@ -286,6 +292,20 @@ window.CreateNewMeetupForm = React.createClass
         dateWithLabel
           onChange: @dateChanged
           date: @state.meetup.date
+
+        DOM.div
+          className: "form-group"
+          DOM.label
+            htmlFor: "technology"
+            className: "col-lg-2 control-label"
+            "Technology"
+          DOM.div
+            className: 'col-lg-10'
+            DOM.select
+              className: "form-control"
+              onChange: @technologyChanged
+              value: @state.meetup.technology
+              DOM.option(value: tech.name, key: tech.id, tech.name) for tech in @props.technologies            
 
         formInputWithLabelAndReset
           id: "seo"
