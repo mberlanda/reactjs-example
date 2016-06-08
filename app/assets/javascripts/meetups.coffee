@@ -4,21 +4,48 @@
 
 DOM = React.DOM
 
+monthName = (monthNumberStartingFromZero) ->
+  [
+    "January", "February", "March", "April", "May", "June", "July",
+    "August", "September", "October", "November", "December"
+  ][monthNumberStartingFromZero]
+
+dayName = (date) ->
+  dayNameStartingWithSundayZero = date.getDay()
+  [
+    "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+  ][dayNameStartingWithSundayZero]
+
 DateWithLabel = React.createClass
   
   getDefaultProps: ->
     date: new Date()
-
+ 
   displayName: "DateWithLabel"
-  
-  onYearChange: ->
+  onYearChange: (event) ->
     newDate = new Date(
       event.target.value,
       @props.date.getMonth(),
       @props.date.getDate(),
       )
-    @propos.onChange(newDate)
-  
+    @props.onChange(newDate)
+
+  onMonthChange: (event) ->
+    newDate = new Date(
+      @props.date.getFullYear(),
+      event.target.value,
+      @props.date.getDate(),
+      )
+    @props.onChange(newDate)
+
+  onDateChange: (event) ->
+    newDate = new Date(
+      @props.date.getFullYear(),
+      @props.date.getMonth(),
+      event.target.value,
+      )
+    @props.onChange(newDate)
+
   render: -> 
     DOM.div
       className: "form-group"
@@ -32,6 +59,27 @@ DateWithLabel = React.createClass
           onChange: @onYearChange
           value: @props.date.getFullYear()
           DOM.option(value: year, key: year, year) for year in [2015..2020]
+      DOM.div
+        className: "col-lg-3"
+        DOM.select
+          className: "form-control"
+          onChange: @onMonthChange
+          value: @props.date.getMonth()
+          DOM.option(value: month, key: month, "#{month + 1} - #{monthName(month)}") for month in [0..11]
+
+      DOM.div
+        className: "col-lg-2"
+        DOM.select
+          className: "form-control"
+          onChange: @onDateChange
+          value: @props.date.getDate()
+          for day in [1..31]
+            date = new Date(
+              @props.date.getFullYear(),
+              @props.date.getMonth(),
+              day
+            )
+            DOM.option(value: day, key: day, "#{day}-#{dayName(date)}")
 
 dateWithLabel = React.createFactory(DateWithLabel)
 
@@ -88,10 +136,11 @@ window.CreateNewMeetupForm = React.createClass
 
   dateChanged: (newDate) ->
     @state.meetup.date = newDate
-    @forceUpdate
+    @forceUpdate()
 
   formSubmitted: (event) ->
     event.preventDefault()
+    meetup = @state.meetup
 
     $.ajax
       url: "/meetups.json"
@@ -99,7 +148,11 @@ window.CreateNewMeetupForm = React.createClass
       dataType: "JSON"
       contentType: "application/json"
       processData: false
-      data: JSON.stringify({meetup: @state.meetup})
+      data: JSON.stringify({meetup:{ 
+        title: meetup.title,
+        description: meetup.description,
+        date: "#{meetup.date.getFullYear()}-#{meetup.date.getMonth()+1}-#{meetup.date.getDate()}"
+      }})
 
   render: ->
     DOM.form
