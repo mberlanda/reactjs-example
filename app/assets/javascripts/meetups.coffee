@@ -83,6 +83,45 @@ DateWithLabel = React.createClass
 
 dateWithLabel = React.createFactory(DateWithLabel)
 
+FormInputWithLabelAndReset = React.createClass
+  displayName: "FormInputWithLabelAndReset"
+  render: ->
+    DOM.div
+      className: "form-group"
+      DOM.label
+        htmlFor: @props.id
+        className: "col-lg-2 control-label"
+        @props.labelText
+      DOM.div
+        className: "col-lg-8"
+        DOM.div
+          className: "input-group"
+          DOM.input
+            className: "form-control"
+            placeholder: @props.placeholder
+            id: @props.id
+            value: @props.value
+            onChange: (event) =>
+              @props.onChange(event.target.value)
+          DOM.span
+            className: "input-group-btn"
+            DOM.button
+              onClick: ()=>
+                @props.onChange(null)
+              className: "btn btn-default"
+              type: "button"
+              DOM.i
+                className: "fa fa-magic"
+            DOM.button
+              onClick: ()=>
+                @props.onChange("")
+              className: "btn btn-default"
+              type: "button"
+              DOM.i
+                className: "fa fa-times-circle"
+
+formInputWithLabelAndReset = React.createFactory(FormInputWithLabelAndReset)
+
 FormInputWithLabel = React.createClass
   
   getDefaultProps: ->
@@ -124,6 +163,7 @@ window.CreateNewMeetupForm = React.createClass
         title: "",
         description: "",
         date: new Date(),
+        seoText: null
       }
     }
   titleChanged: (event) ->
@@ -138,6 +178,16 @@ window.CreateNewMeetupForm = React.createClass
     @state.meetup.date = newDate
     @forceUpdate()
 
+  seoChanged: (seoText) ->
+    @state.meetup.seoText = seoText
+    @forceUpdate()
+
+  computeDefaultSeoText: () ->
+    words = @state.meetup.title.toLowerCase().split(/\s+/)
+    words.push(monthName(@state.meetup.date.getMonth()))
+    words.push(@state.meetup.date.getFullYear().toString())
+    words.filter( (string) -> string.trim().length > 0).join("-").toLowerCase()
+
   formSubmitted: (event) ->
     event.preventDefault()
     meetup = @state.meetup
@@ -151,7 +201,8 @@ window.CreateNewMeetupForm = React.createClass
       data: JSON.stringify({meetup:{ 
         title: meetup.title,
         description: meetup.description,
-        date: "#{meetup.date.getFullYear()}-#{meetup.date.getMonth()+1}-#{meetup.date.getDate()}"
+        date: "#{meetup.date.getFullYear()}-#{meetup.date.getMonth()+1}-#{meetup.date.getDate()}",
+        seo: @state.meetup.seoText || @computeDefaultSeoText()
       }})
 
   render: ->
@@ -179,6 +230,13 @@ window.CreateNewMeetupForm = React.createClass
         dateWithLabel
           onChange: @dateChanged
           date: @state.meetup.date
+
+        formInputWithLabelAndReset
+          id: "seo"
+          value: if @state.meetup.seoText? then @state.meetup.seoText else @computeDefaultSeoText()
+          onChange: @seoChanged
+          placeholder: "SEO text"
+          labelText: "seo"
 
         DOM.div
           className: "form-group"
