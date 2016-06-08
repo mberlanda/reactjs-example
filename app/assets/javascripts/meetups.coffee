@@ -138,7 +138,8 @@ FormInputWithLabel = React.createClass
         className: "col-lg-2 control-label"
         @props.labelText
       DOM.div
-        className: "col-lg-10"
+        className: 'col-lg-10' + {true: 'has-warning', false: ''}[!!@props.warning]
+        @warning()
         DOM[@props.elementType]
           className: "form-control"
           placeholder: @props.placeholder
@@ -151,6 +152,12 @@ FormInputWithLabel = React.createClass
       "input": @props.inputType,
       "textarea": null,
     }[@props.elementType]
+  warning: ->
+    return null unless @props.warning
+    DOM.label
+      className: "control-label"
+      htmlFor: @props.id
+      @props.warning
 
 formInputWithLabel = React.createFactory(FormInputWithLabel)
 
@@ -164,11 +171,18 @@ window.CreateNewMeetupForm = React.createClass
         description: "",
         date: new Date(),
         seoText: null
-      }
+      },
+      warnings: {
+        title: null
+      },
     }
   titleChanged: (event) ->
     @state.meetup.title = event.target.value
+    @validateTitle()
     @forceUpdate()
+
+  validateTitle: () ->
+    @state.warnings.title = if /\S/.test(@state.meetup.title) then null else "Cannot be blank"
 
   descriptionChanged: (event) ->
     @state.meetup.description = event.target.value
@@ -218,6 +232,7 @@ window.CreateNewMeetupForm = React.createClass
           onChange: @titleChanged
           placeholder: "Meetup title"
           labelText: "Title"
+          warning: @state.warnings.title
 
         formInputWithLabel
           id: "description"
