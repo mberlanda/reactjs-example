@@ -13,3 +13,7 @@
  *= require_tree .
  *= require_self
  */
+.form-input-separator {
+margin-left: -15px;
+margin-right: -15px;
+}
